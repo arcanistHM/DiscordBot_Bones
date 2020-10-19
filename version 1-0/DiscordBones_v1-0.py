@@ -108,7 +108,7 @@ def fixToken():
     print("Do you with to paste a new key? (y/n)")
     while x == 0:
         ans = str(input())
-        ans.upper()                                 #Make any answer a uniform capital for easy reading
+        ans = ans.upper()                           #Make any answer a uniform capital for easy reading
         if ans == "Y":
             key = str(input("Paste key now: "))     #Grab the new key from the operator
             with open("key.txt", "w") as file:      #Open/Create a file for the token and paste the key into it
