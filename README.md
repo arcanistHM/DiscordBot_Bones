@@ -5,6 +5,7 @@ This repository is meant to host some files I have constructed for an open sourc
 
 Make sure that prior to running the bot, you have installed the Discord API packages.
 As a brief reminder...
+
 LINUX Terminal:
 > python3 -m pip install -U discord.py
 
