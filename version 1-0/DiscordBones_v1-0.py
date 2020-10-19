@@ -112,7 +112,7 @@ def fixToken():
         if ans == "Y":
             key = str(input("Paste key now: "))     #Grab the new key from the operator
             with open("key.txt", "w") as file:      #Open/Create a file for the token and paste the key into it
-                f.write(key)
+                file.write(key)
             x = 1                                   #Valid answer received; marking loop for closure
         elif ans == "N":
             x = 1                                   #Valid answer received; marking loop for closure
