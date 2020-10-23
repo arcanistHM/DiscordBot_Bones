@@ -195,7 +195,6 @@ def botCommands(c):
         name = context.message.author.mention
         print("Diceroll Requested: " + str(caller))
         result = mainRoller(msg)
-        print(result)
         await context.channel.send(name + "\n" + str(result))
 
 """
@@ -222,7 +221,7 @@ Reading a message:
 def main():
     cacheReload()
     toke = checkToken()
-    client = commands.Bot(command_prefix = "/b ")
+    client = commands.Bot(command_prefix = ".b ")
     botCommands(client)
     client.run(toke)
     return
