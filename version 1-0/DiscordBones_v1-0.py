@@ -25,8 +25,8 @@ that sort of effort goes a long way towards getting a full grasp over any topic.
 The Bones programs are derived from systems created by 13 Swords.
 All programming to create the Bones programs are by Hailed Manic.
 
-Version: 1-0
-Date: 10/18/2020
+Version: 1-1
+Date: 10/23/2020
 """
 
 import asyncio, discord, os, shutil
@@ -62,134 +62,71 @@ Vestigial
 # ===== ===== =====
 # BEGIN MODULES
 # ===== ===== =====
-"""During the execution of the code, there are print() lines added in to
-provide feedback to the operator and report what is happening while the
-bot is in use."""
 
 # Check for valid token on file.
-# If there is no token on file or the token is not a valid length
-# then the operator will be given a chance to create/amend the token.
-# Failure to provide a valid token will result in this module returning
-# a fail value of '0'.
 def checkToken():
     x = 0
     while x == 0:
         print("Loading token...")
-        if os.path.exists("key.txt"):                   #A token is needed run any Discord bot.  These are free to acquire from http://discord.com/devleopers/applicaions
+        if os.path.exists("key.txt"):
             print("\'key.txt\' located \nExtracting...")
-            with open("key.txt", "r") as file:          #Temporarily open the key.txt file (in the same directory as this program) and grab the token
+            with open("key.txt", "r") as file:
                 t = file.read()
             l = len(t)
             print("Checking key length")
-            if l == 59:                                 #As of 10/18/2020, I believe all bot tokens are 59 characters in length.  Further reasearch is needed to confirm this
+            if l == 59:
                 print("Key of correct length found \nApplying...")
-                x = 1                                   #Mark the loop for closure
+                x = 1
             else:
                 print("Key length not correct.\nPlease fix key.txt")
-                y = fixToken()                          #Offer chance to fix token in-program
-                if y != "Y":                            #If the operator declines to fix the toekn...
-                    x = 1                                   #...the loop is marked for closure
-                    t = 0                                   #...a failure value is marked
+                y = fixToken()
+                if y != "Y":
+                    x = 1
+                    t = 0
         else:
             print("No token file found.")
-            y = fixToken()                              #Offer chance to create a token
-            if y != "Y":                                #As above, if the operator declines to create a token...
-                x = 1                                       #...the loop is marked for closure
-                t = 0                                       #...a failure value is marked
+            y = fixToken()
+            if y != "Y":
+                x = 1
+                t = 0
     return t
 
 # In-Program fix for bot token.
-# The operator simply needs to input a clear 'Y' or 'N' for this module.
-# (Capitalization does not matter)
-# 'Y' will direct the operator to provide a token.
-# 'N' carries on without creating/changing the 'key.txt' file.
 def fixToken():
     x = 0
     print("Do you with to paste a new key? (y/n)")
     while x == 0:
         ans = str(input())
-        ans = ans.upper()                           #Make any answer a uniform capital for easy reading
+        ans = ans.upper()
         if ans == "Y":
-            key = str(input("Paste key now: "))     #Grab the new key from the operator
-            with open("key.txt", "w") as file:      #Open/Create a file for the token and paste the key into it
+            key = str(input("Paste key now: "))
+            with open("key.txt", "w") as file:
                 file.write(key)
-            x = 1                                   #Valid answer received; marking loop for closure
+            x = 1
         elif ans == "N":
-            x = 1                                   #Valid answer received; marking loop for closure
+            x = 1
     return ans
 
 # Flush and create caching folder.
-"""For memory purposes, this bot makes use of a cache to contain temporary files.
-The purpose is to create one(1) temp file per User per Request Type.  This means that
-every user can have one file of each type of recordable request sent to the bot.
-    For example:
-        > User A requests Objective
-            >> UserATmpObj is made
-        > User B request Objective and Diceroll
-            >> UserBTmpObj is made
-            >> UserBTmpDce is made
-        > User A can request the file for their Objective
-        > User B can request the file for their Objective and their Diceroll
-        > Files persist in memory until overwritten by...
-            >> ...a new request of the same type
-            >> ...bot is shut down and rebooted
-Utilizing a caching system makes it easier to manage the requests from multiple users.
-"""
-# This module creates a folder within the same directory as the program
-# is running in to cache temporary files.  If a cache folder already
-# exists, then it will be deleted, along with all the contents, BEFORE a
-# new cache is created.
-# Deleting the cache is meant to act as a space-saver and clean up old,
-# unneeded files.
 def cacheReload():
-    if os.path.exists("caching"):       #Check for the cache folder
-        shutil.rmtree("caching")        #Delete the cache along with ALL contents
+    if os.path.exists("caching"):
+        shutil.rmtree("caching")
         print("Purging Cache: \\caching\\")
     else:
         print("No leftover cache found")
     print("Creating cache folder...")
-    os.mkdir("caching")                 #Create a new folder for the cache
+    os.mkdir("caching")
 
 
 # ----- ----- ----- ----- ----- -----
 # Listing all possible commands and abilities give to the bot.
-"""The next section contains the list of commands and responses the bot will be able to utilize.
-Pay close attention to the exact commands used.  This is where things can get complicated very quickly.
-'async' is very important here, as you don't want this to be read linearly.  The bot needs to be able
-to receive any command at any time."""
 # ----- ----- ----- ----- ----- -----
 def botCommands(c):
     @c.event
     async def on_ready():
         print("Discord Bones is ready.")
         return
-
-    """
-    When creating a Command for the bot, there are a few features that can be packed into the command data.
-    Do NOT try to create a 'help' command.  Discord API automatically integrates that command.  You can affect the
-    information given in the 'help' response, though.
-    Every command created will be listed in the 'help' response.  You can alter the meta data of the commands
-    to give more helpful context.
-        - name          : The title of the command; can be called with this name
-                            + If none, it will default to the name given after 'async def'
-        - description   : A longer (and hopefully better detailed) description of the command
-                            + Accessed when someone calls 'help' and the command name
-        - brief         : A short description that appears in the immediate help response
-        - aliases       : A list of keywords that call the same command
-                            + If there is a list given, it will ingore the name given after 'async def'
-                            + The value for 'name' is part of this list and should NOT be repeated here
-        - pass_context  : Allows for additional conditions before processing the command
-                            + Normally, this should be set to True to allow the command
-                            + Alternatively, this can be ignored when writing the meta data to keep it True and not
-                                risk affecting it
     
-    To make a command, there are two basic parts...
-        @<prefix command>.command()
-        async def <module name>(<context variable>):
-
-    After the 'async def' line, indent as appropriate and write in the code for how the program should respond to
-    the received command.
-    """
     # Basic 'hello' test command
     @c.command(name = "Hello",
                description = "Sends a 'hello' back as a basic, low-level system test",
@@ -203,50 +140,35 @@ def botCommands(c):
         print("Hello requested: " + str(caller))
         await ctx.send("Hello, this is a testing command.")
 
-    # This command calls upon the ObjBones_D program to generate an objective.  The User ID of the
-    # person calling on this command is used to create a file name in the cache system, making it
-    # identifiable for other uses.
-    # The result of the file are put into a string variable and printed out, as well as pinging the
-    # person who called the command.  The formating rules for Discord messages apply here, as well.
-    # In this instance the tidle(`) signs are used to offset the objective in 'code format'.
+    # Calls upon the ObjBones_D program to generate an objective.
     @c.command(name = "Objective Generator",
                description = "Uses a derivitive of the Objective Bones program to create a bare bones outline for an objective/mission/quest",
                brief = "Create a barebones objective",
                aliases = ["obj", "Obj", "OBJ", "Objective", "objective"])
     async def objective(ctx):
         caller = ctx.message.author.id
-        name = str(ctx.message.author.mention)      #Similar to '.author.id'; however, this adds an '@'...
-        print("Objective requested: " + str(caller))    #...to the beginning, allowing the author to be pinged
+        name = str(ctx.message.author.mention)
+        print("Objective requested: " + str(caller))
         fileName = str(caller) + "_tmpObj.txt"
-        async with ctx.typing():                    #Turns on typing indicator while the following processes
-            obj = mainObj(fileName)                 #Calls on and runs the ObjectiveBones_D program...
-                                                    #...and returns a string with the entire objective result
+        async with ctx.typing():
+            obj = mainObj(fileName)
         await ctx.send(name + "\n" + "`" + obj + "`")
-    
-    # This command produces the temp file related to the caller.
-    # The User ID is grabbed, along with the first word after the command sign.  The first word
-    # is used to determine the type of file being requested.  The command also checks if the
-    # request file even exists, first of all.
+
     # Currently, the file types available are:
     #   - Objective
     @c.command(name = "Save",
                     description = "Order a .txt file for the results recived. (Add 'obj' or 'dice' to your message)",
                     brief = "Save results as .txt",
                     aliases = ["file", "File", "FILE", "s", "S", "save", "SAVE"])
-    async def save(ctx, fInp):                  #Grab metadata and first word after callsign
-        caller = ctx.message.author.id          #Grab User ID
-        name = ctx.message.author.mention       #Grab Mention to ping caller
+    async def save(ctx, fInp):
+        caller = ctx.message.author.id
+        name = ctx.message.author.mention
         print("File requested: " + str(caller))
 
-        # Checks request against possible words to indicate type of file desired
         #   - Obj : Objective Bones file
-        #   - Dce : Diceroll
         if fInp in ["OBJ", "Obj", "obj", "O", "o", "OBOJECTIVE", "Objective", "objective"]:
             fType = "Obj"
             print("Type: Objective")
-        elif fInp in ["DICE", "Dice", "dice", "D", "d", "ROLL", "Roll", "roll", "R", "r"]:
-            fType = "Dce"
-            print("Type: Diceroll")
         else:
             fType = ""
             print("Type: NULL")
@@ -272,9 +194,9 @@ def botCommands(c):
         caller = context.message.author.id
         name = context.message.author.mention
         print("Diceroll Requested: " + str(caller))
-        fileName = "caching\\" + str(caller) + "_tmpDce.txt"
-        result = mainRoller(fileName, msg)
-        await context.channel.send(name + "\n" + result)
+        result = mainRoller(msg)
+        print(result)
+        await context.channel.send(name + "\n" + str(result))
 
 """
 asyc def <module name>(<context variable>)
@@ -300,7 +222,7 @@ Reading a message:
 def main():
     cacheReload()
     toke = checkToken()
-    client = commands.Bot(command_prefix = ".b ")
+    client = commands.Bot(command_prefix = "/b ")
     botCommands(client)
     client.run(toke)
     return
