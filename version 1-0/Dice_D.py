@@ -136,7 +136,6 @@ def mainRoller(userLine):
         resultsLine = printOutput(total, rollResults, diceSets)
     else:
         resultsLine = "Formatting Error."
-    print(resultsLine)
     return resultsLine
 
 # ===== ===== =====
